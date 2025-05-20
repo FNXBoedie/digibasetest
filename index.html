@@ -12,14 +12,14 @@
             --background: #121212;
             --surface: #1e1e1e;
             --surface-variant: #252525;
-            --primary: #50A0E0; 
-            --primary-variant: #408CCA; 
-            --secondary: #70B4F0; 
+            --primary: #50A0E0;
+            --primary-variant: #408CCA;
+            --secondary: #70B4F0;
             --text-primary: #e1e1e1;
             --text-secondary: #b0b0b0;
             --border: rgba(255, 255, 255, 0.1);
             --shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            --user-message: var(--primary); 
+            --user-message: var(--primary);
             --bot-message: #2d2d2d;
             --container-width: 1000px;
             --border-radius: 16px;
@@ -69,8 +69,8 @@
             color: var(--text-secondary);
             font-weight: 500;
         }
-        
-        /* --- NIEUW: Help Knop en Menu --- */
+
+        /* --- Help Knop en Menu --- */
         #helpSection {
             position: absolute;
             top: 0;
@@ -149,7 +149,7 @@
 
         #fileLoadSection {
             padding: 16px;
-            background-color: rgba(80, 160, 224, 0.08); 
+            background-color: rgba(80, 160, 224, 0.08);
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
@@ -240,7 +240,7 @@
         #chatInputSection {
             padding: 16px 20px;
             background-color: var(--surface-variant);
-            display: flex; 
+            display: flex;
             align-items: center;
             border-top: 1px solid var(--border);
         }
@@ -255,7 +255,7 @@
             font-size: 15px;
             outline: none;
             transition: background-color 0.2s ease;
-            box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.4); 
+            box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.4);
         }
         #userInput::placeholder {
             color: var(--text-secondary);
@@ -263,7 +263,7 @@
         }
         #userInput:focus {
             background-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.6); 
+            box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.6);
         }
 
         #sendButton {
@@ -279,7 +279,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 10px rgba(80, 160, 224, 0.3); 
+            box-shadow: 0 2px 10px rgba(80, 160, 224, 0.3);
         }
         #sendButton:hover {
             background-color: var(--primary-variant);
@@ -297,8 +297,8 @@
             opacity: 0.7;
         }
 
-        /* --- NIEUW: Popup Styles --- */
-        .popup-overlay { /* Optioneel: voor een achtergrond-dim */
+        /* --- Popup Styles --- */
+        .popup-overlay {
             display: none; /* Initieel verborgen */
             position: fixed;
             top: 0;
@@ -310,10 +310,10 @@
         }
 
         .popup {
-            display: none; /* Initieel verborgen */
+            display: none; /* Initieel verborgen, JS zet dit naar 'flex' om te tonen */
             position: fixed;
             top: 50%;
-            left: calc(20px + (var(--popup-width) / 2)); /* Links van de pagina, gecentreerd op zijn eigen breedte */
+            left: calc(20px + (var(--popup-width) / 2));
             transform: translate(-50%, -50%);
             width: var(--popup-width);
             max-height: 80vh;
@@ -322,8 +322,7 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             z-index: 1001;
-            display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Deze wordt actief wanneer display: flex is */
             animation: slideInFromLeft 0.3s ease-out;
         }
 
@@ -331,7 +330,7 @@
             from { opacity: 0; transform: translate(-70%, -50%); }
             to { opacity: 1; transform: translate(-50%, -50%); }
         }
-        
+
         .popup-header {
             display: flex;
             justify-content: space-between;
@@ -361,8 +360,26 @@
             padding: 20px;
             overflow-y: auto;
             flex-grow: 1;
+            /* Styling voor handleiding content */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: var(--primary) rgba(30,30,30,0.5); /* Firefox: thumb track */
         }
-        /* Styling voor handleiding content */
+        .popup-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .popup-content::-webkit-scrollbar-track {
+            background: rgba(30,30,30,0.5); /* var(--surface) is #1e1e1e */
+            border-radius: 8px;
+        }
+        .popup-content::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 8px;
+            border: 2px solid var(--surface); /* Geeft een 'ingebed' effect */
+        }
+        .popup-content::-webkit-scrollbar-thumb:hover {
+            background-color: var(--primary-variant);
+        }
+
         .popup-content h2, .popup-content h3 {
             color: var(--secondary);
             margin-top: 1em;
@@ -471,7 +488,6 @@
 <div id="appHeader">
     <h1>DigiBase Json met handleiding</h1>
     <p>Uw interne virtuele assistent van Digipunt</p>
-    <!-- NIEUW: Help Sectie -->
     <div id="helpSection">
         <button id="helpButton" aria-label="Help en opties">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -503,7 +519,6 @@
 
 <div class="powered-by">Powered by Gemini AI</div>
 
-<!-- NIEUW: Pop-up containers -->
 <div class="popup-overlay" id="popupOverlay"></div>
 
 <div class="popup" id="manualPopup">
@@ -512,7 +527,6 @@
         <button class="popup-close-button" id="closeManualButton" aria-label="Sluit handleiding">×</button>
     </div>
     <div class="popup-content" id="manualContent">
-        <!-- Handleiding wordt hier geladen -->
         <p>Bezig met laden van handleiding...</p>
     </div>
 </div>
@@ -530,9 +544,9 @@
 
 <script>
     // --- CONFIGURATIE ---
-    const GEMINI_API_KEY = "AIzaSyAkeZNQdyOcf27Wo9D75ydwELGC2XeM_eU"; 
-    const DATA_FILE_URL = 'data.json'; 
-    const MANUAL_FILE_URL = 'handleiding.html'; // << NIEUW
+    const GEMINI_API_KEY = "AIzaSyAkeZNQdyOcf27Wo9D75ydwELGC2XeM_eU";
+    const DATA_FILE_URL = 'data.json';
+    const MANUAL_FILE_URL = 'handleiding.html';
     const MAX_HISTORY_TURNS = 5;
 
     // --- GLOBALE VARIABELEN ---
@@ -544,12 +558,12 @@
     const fileLoadSection = document.getElementById('fileLoadSection');
     const chatInputSection = document.getElementById('chatInputSection');
 
-    // --- NIEUW: DOM Elementen voor Help & Popups ---
+    // --- DOM Elementen voor Help & Popups ---
     const helpButton = document.getElementById('helpButton');
     const helpMenu = document.getElementById('helpMenu');
     const manualButton = document.getElementById('manualButton');
     const exampleQuestionsButton = document.getElementById('exampleQuestionsButton');
-    
+
     const popupOverlay = document.getElementById('popupOverlay');
     const manualPopup = document.getElementById('manualPopup');
     const examplePopup = document.getElementById('examplePopup');
@@ -581,7 +595,7 @@
                  loadStatus.innerHTML = `<span class="warning">Fout: Kon data niet ophalen van ${DATA_FILE_URL}. Status: ${response.status}</span>`;
                  return;
             }
-            const jsonData = await response.json(); 
+            const jsonData = await response.json();
             processCompanyInfo(jsonData);
 
             loadStatus.textContent = `Data succesvol geladen. De assistent is klaar!`;
@@ -593,7 +607,7 @@
             }, 1500);
 
         } catch (error) {
-            if (error instanceof SyntaxError) { 
+            if (error instanceof SyntaxError) {
                  loadStatus.innerHTML = `<span class="warning">Fout: De data in ${DATA_FILE_URL} is geen geldige JSON. Controleer het bestand. (${error.message})</span>`;
             } else {
                  loadStatus.innerHTML = `<span class="warning">Fout bij ophalen data: ${error.message}</span>`;
@@ -613,7 +627,7 @@
             } else {
                 console.error("Ongeldig JSON-formaat in processCompanyInfo.");
                 loadStatus.innerHTML = `<span class="warning">Fout: Ongeldige structuur in het databestand.</span>`;
-                infoChunks = []; 
+                infoChunks = [];
             }
         }
     }
@@ -646,14 +660,14 @@
         addMessageToChat(query, 'user');
         userInput.value = '';
         const thinkingMsgId = 'thinking-message-' + Date.now();
-        addMessageToChat("Even aan het nadenken...", 'bot', thinkingMsgId, true); 
+        addMessageToChat("Even aan het nadenken...", 'bot', thinkingMsgId, true);
 
         if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
             removeMessageById(thinkingMsgId);
             addMessageToChat("FOUT: Gemini API Key niet correct geconfigureerd.", 'bot');
             return;
         }
-        
+
         const context = findRelevantChunks(query);
         let currentConversationContents = [];
         const historyForGemini = conversationHistory.map(turn => ({
@@ -725,7 +739,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', sender);
         if (isThinking) messageDiv.classList.add('thinking');
-        messageDiv.textContent = text; 
+        messageDiv.textContent = text;
         if (id) messageDiv.id = id;
         chatbox.appendChild(messageDiv);
         chatbox.scrollTop = chatbox.scrollHeight;
@@ -742,12 +756,11 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
         const msg = document.getElementById(id);
         if (msg) msg.remove();
     }
-    
-    // --- NIEUW: Popup en Help Menu Logica ---
+
+    // --- Popup en Help Menu Logica ---
     function openPopup(popupElement) {
         popupOverlay.style.display = 'block';
-        popupElement.style.display = 'flex'; // Omdat popup een flex container is
-        // Sluit het help menu als een popup opent
+        popupElement.style.display = 'flex'; // Zet display naar flex om de popup te tonen en flex-direction te activeren
         helpMenu.style.display = 'none';
     }
 
@@ -757,6 +770,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
     }
 
     async function loadManual() {
+        manualContent.innerHTML = '<p>Bezig met laden van handleiding...</p>'; // Reset
         try {
             const response = await fetch(MANUAL_FILE_URL);
             if (!response.ok) {
@@ -772,7 +786,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
     }
 
     function populateExampleQuestions() {
-        exampleQuestionsContent.innerHTML = ''; // Leegmaken voor het geval het opnieuw wordt aangeroepen
+        exampleQuestionsContent.innerHTML = '';
         exampleQuestions.forEach(questionText => {
             const button = document.createElement('button');
             button.classList.add('example-question-button');
@@ -780,7 +794,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
             button.onclick = () => {
                 userInput.value = questionText;
                 sendMessage();
-                closePopup(examplePopup);
+                // closePopup(examplePopup); // VERWIJDERD: Popup blijft open
             };
             exampleQuestionsContent.appendChild(button);
         });
@@ -788,30 +802,29 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
 
     // Event Listeners voor Help en Popups
     helpButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Voorkom dat klikken op de knop direct body-listener triggert
+        event.stopPropagation();
         helpMenu.style.display = helpMenu.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Klik buiten het menu sluit het menu
     document.addEventListener('click', (event) => {
-        if (!helpMenu.contains(event.target) && event.target !== helpButton) {
-            helpMenu.style.display = 'none';
+        if (!helpMenu.contains(event.target) && event.target !== helpButton && !helpButton.contains(event.target) ) {
+             helpMenu.style.display = 'none';
         }
     });
 
     manualButton.addEventListener('click', () => {
         openPopup(manualPopup);
-        loadManual(); // Laad de handleiding als de popup opent
+        loadManual();
     });
 
     exampleQuestionsButton.addEventListener('click', () => {
         openPopup(examplePopup);
-        populateExampleQuestions(); // Genereer knoppen als de popup opent
+        populateExampleQuestions();
     });
 
     closeManualButton.addEventListener('click', () => closePopup(manualPopup));
     closeExampleButton.addEventListener('click', () => closePopup(examplePopup));
-    popupOverlay.addEventListener('click', () => { // Klik op overlay sluit actieve popup
+    popupOverlay.addEventListener('click', () => {
         closePopup(manualPopup);
         closePopup(examplePopup);
     });
@@ -829,14 +842,18 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
     window.onload = () => {
         if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
             loadStatus.innerHTML = `Welkom! <span class="warning">Configureer a.u.b. uw Gemini API Key.</span>`;
-            chatInputSection.style.display = 'flex'; 
+            chatInputSection.style.display = 'flex';
             userInput.placeholder = "API Key niet geconfigureerd...";
             userInput.disabled = true;
             document.getElementById('sendButton').disabled = true;
-            helpButton.disabled = true; // Ook helpknop uitschakelen
+            helpButton.disabled = true;
         } else {
-            loadDataFromUrl(); 
+            loadDataFromUrl();
         }
+        // Zorg ervoor dat popups initieel verborgen zijn (extra zekerheid, hoewel CSS dit al zou moeten doen)
+        manualPopup.style.display = 'none';
+        examplePopup.style.display = 'none';
+        popupOverlay.style.display = 'none';
     };
 </script>
 
