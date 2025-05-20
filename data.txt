@@ -191,74 +191,53 @@ Mailadres: george.sandu@ateljeevzw.be
 Telefoon: 0487 477 850
 Datum In Dienst: 27-12-2022
 
-Johan Marien
+### Johan Marien ###
 Mailadres: Johan.Marien@ateljeevzw.be
-
 Telefoon: 0486 961 792
-
 Datum In Dienst: 1-10-2017
 
-Kay Dedeurwaerdere
+### Kay Dedeurwaerdere ###
 Mailadres: kay.de.deurwaerdere@ateljeevzw.be
-
 Telefoon: 0472 040 919
-
 Datum In Dienst: 17-1-2022
 
-Ayman Nasser
+### Ayman Nasser ###
 Mailadres: ayman.nasser@ateljeevzw.be
-
 Telefoon: 0467 63 32 64
-
 Datum In Dienst: Onbekend (niet gespecificeerd)
 
-Samir Azizi
+### Samir Azizi ###
 Mailadres: Samir.Azizi@ateljeevzw.be
-
 Telefoon: 0466 039 613
-
 Datum In Dienst: 15-3-2021
 
-Jeroen De Riek
+### Jeroen De Riek ###
 Mailadres: jeroen.de.riek@ateljeevzw.be
-
 Telefoon: 0478 11 63 16
+Datum In Dienst: 25-2-2025 (
 
-Datum In Dienst: 25-2-2025 (Let op: datum ligt in de toekomst)
-
-Silvie Franck
+### Silvie Franck ###
 Mailadres: Silvie.Franck@ateljeevzw.be
-
 Telefoon: 0477 503 259
-
 Datum In Dienst: 5-7-2021
 
-Dirk De Wolf
+### Dirk De Wolf ###
 Rol: Tijdelijke teamleader Digipunt
-
 Mailadres: dirk.de.wolf@ateljeevzw.be
-
 Telefoon: 0490 66 42 31
 
-Datum In Dienst: Onbekend (niet gespecificeerd)
 
-Geert Deruyck
+### Geert Deruyck ###
 Rol: COO Ateljee
-
 Mailadres: geert.deruyck@ateljeevzw.be
-
 Telefoon: 0499 52 73 95
 
-Datum In Dienst: Onbekend (niet gespecificeerd)
 
-Tine Verheecke
+### Tine Verheecke ###
 Rol: Arbeidsbegeleider
-
 Mailadres: tine.verheecke@ateljeevzw.be
-
 Telefoon: 0499987383
 
-Datum In Dienst: Onbekend (niet gespecificeerd)
 
 ### Wat is District09? ###
 District09 is de ICT-partner van Stad Gent.
