@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="nl-BE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DigiBase - Digipunt Assistent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #121212;
+            --surface: #1e1e1e;
+            --surface-variant: #252525;
+            /* Updated primary and secondary colors */
+            --primary: #50A0E0; /* Professional Light Blue */
+            --primary-variant: #408CCA; /* Darker shade for hover */
+            --secondary: #70B4F0; /* Lighter blue for gradient or accents */
+            --text-primary: #e1e1e1;
+            --text-secondary: #b0b0b0;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --user-message: var(--primary); /* User messages use new primary */
+            --bot-message: #2d2d2d;
+            --container-width: 800px;
+            --border-radius: 16px;
+            --input-radius: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #appHeader {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        #appHeader h1 {
+            font-size: 32px;
+            font-weight: 700;
+            /* Updated gradient */
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        #appHeader p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        #chatContainer {
+            width: 100%;
+            max-width: var(--container-width);
+            height: 75vh;
+            max-height: 700px;
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        #fileLoadSection {
+            padding: 16px;
+            background-color: rgba(80, 160, 224, 0.08); /* Adjusted for new primary */
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status {
+            color: var(--secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .warning {
+            color: #FF453A;
+            font-weight: 600;
+        }
+
+        #chatbox {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        #chatbox::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatbox::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        #chatbox::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            font-size: 15px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user {
+            background-color: var(--user-message);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot {
+            background-color: var(--bot-message);
+            color: var(--text-primary);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+
+        .bot.thinking {
+            background-color: rgba(45, 45, 45, 0.7);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bot.thinking::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            width: 50%;
+            /* Thinking bar uses secondary color */
+            background: linear-gradient(90deg, transparent, var(--secondary), transparent);
+            animation: loadingBar 1.5s infinite;
+        }
+
+        @keyframes loadingBar {
+            0% { left: -50%; }
+            100% { left: 100%; }
+        }
+
+        #chatInputSection {
+            padding: 16px 20px;
+            background-color: var(--surface-variant);
+            display: flex; /* Made flex by default */
+            align-items: center;
+            border-top: 1px solid var(--border);
+        }
+
+        #userInput {
+            flex: 1;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: var(--input-radius);
+            font-size: 15px;
+            outline: none;
+            transition: background-color 0.2s ease;
+            /* Default border/shadow for input field */
+            box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.4); /* Using new primary with alpha */
+        }
+
+        #userInput::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        #userInput:focus {
+            background-color: rgba(255, 255, 255, 0.12);
+            /* Shadow is now default, so focus only changes background or could add a stronger shadow if desired */
+             box-shadow: 0 0 0 2px rgba(80, 160, 224, 0.6); /* Slightly more prominent shadow on focus */
+        }
+
+        #sendButton {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-left: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px rgba(80, 160, 224, 0.3); /* Shadow with new primary */
+        }
+
+        #sendButton:hover {
+            background-color: var(--primary-variant);
+            transform: scale(1.05);
+        }
+
+        #sendButton:active {
+            transform: scale(0.95);
+        }
+
+        .powered-by {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* Removed initial hide for chat input as it's now always visible */
+        /* #chatInputSection {
+            display: none; 
+        } */
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #chatContainer {
+                height: 80vh;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #appHeader h1 {
+                font-size: 28px;
+            }
+            
+            #chatContainer {
+                height: 85vh;
+            }
+            
+            #chatInputSection {
+                padding: 12px;
+            }
+            
+            #userInput {
+                padding: 12px 16px;
+            }
+            
+            #sendButton {
+                width: 44px;
+                height: 44px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="appHeader">
+    <h1>DigiBase 1.1</h1>
+    <p>Uw interne virtuele assistent van Digipunt</p>
+</div>
+
+<div id="chatContainer">
+    <div id="fileLoadSection">
+        <p class="status" id="loadStatus">Bezig met laden van bedrijfsgegevens...</p>
+    </div>
+
+    <div id="chatbox"></div>
+
+    <div id="chatInputSection">
+        <input type="text" id="userInput" placeholder="Stel uw vraag aan Digipunt...">
+        <button id="sendButton" onclick="sendMessage()" aria-label="Verstuur bericht">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<div class="powered-by">Powered by Gemini AI</div>
+
+<script>
+    // --- CONFIGURATIE ---
+    const GEMINI_API_KEY = "AIzaSyAkeZNQdyOcf27Wo9D75ydwELGC2XeM_eU"; // AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU
+    const DATA_FILE_URL = 'data.txt'; // URL van uw databestand.
+
+    // --- GLOBALE VARIABELEN ---
+    let infoChunks = [];
+    const chatbox = document.getElementById('chatbox');
+    const userInput = document.getElementById('userInput');
+    const loadStatus = document.getElementById('loadStatus');
+    const fileLoadSection = document.getElementById('fileLoadSection');
+    const chatInputSection = document.getElementById('chatInputSection');
+
+    // --- DATA LAAD LOGICA (van URL) ---
+    async function loadDataFromUrl() {
+        loadStatus.textContent = `Bezig met ophalen van data...`;
+        // Chat input section is now visible by default via CSS, 
+        // so we don't strictly need to set its display here anymore,
+        // but it doesn't hurt to ensure it's flex.
+        chatInputSection.style.display = 'flex'; 
+
+        try {
+            const response = await fetch(DATA_FILE_URL);
+
+            if (!response.ok) {
+                 loadStatus.innerHTML = `<span class="warning">Fout: Kon data niet ophalen van ${DATA_FILE_URL}. Status: ${response.status}</span>`;
+                 console.error("Fetch error:", response.status, response.statusText);
+                 return;
+            }
+
+            const fileContent = await response.text();
+            processCompanyInfo(fileContent);
+
+            loadStatus.textContent = `Data succesvol geladen. De assistent is klaar!`;
+            // Vertraging om de status te tonen, daarna verbergen
+            setTimeout(() => {
+                fileLoadSection.style.display = 'none';
+                // chatInputSection is already visible, but we ensure focus
+                addMessage("Hallo! Ik ben de virtuele assistent van Digipunt. Hoe kan ik u vandaag helpen?", 'bot');
+                userInput.focus();
+            }, 1500);
+
+        } catch (error) {
+            loadStatus.innerHTML = `<span class="warning">Fout bij ophalen data: ${error.message}</span>`;
+            console.error("Fetch error:", error);
+        }
+    }
+
+    // --- DATA VERWERKING ---
+    function processCompanyInfo(text) {
+        infoChunks = text.replace(/\r\n/g, "\n")
+                     .split(/\n\s*\n/) // Split op lege regels
+                     .map(chunk => chunk.trim())
+                     .filter(chunk => chunk.length > 0);
+    }
+
+    // --- CHATBOT LOGICA ---
+    function findRelevantChunks(query) {
+        if (infoChunks.length === 0) return "";
+
+        const queryWords = query.toLowerCase().split(/\s+/).filter(word => word.length > 2 && !["de", "het", "een", "is", "wie", "wat", "waar", "zijn", "ik", "u", "van", "voor"].includes(word));
+
+        let relevantChunksWithScores = [];
+
+        infoChunks.forEach((chunk, index) => {
+            let score = 0;
+            const lowerChunk = chunk.toLowerCase();
+            queryWords.forEach(word => {
+                if (lowerChunk.includes(word)) {
+                    score++;
+                }
+            });
+            if (score > 0) {
+                relevantChunksWithScores.push({ chunk: chunk, score: score });
+            }
+        });
+
+        relevantChunksWithScores.sort((a, b) => b.score - a.score);
+        const topChunks = relevantChunksWithScores.slice(0, 4).map(item => item.chunk); // Iets meer context
+        return topChunks.join("\n\n---\n\n");
+    }
+
+    async function sendMessage() {
+        const query = userInput.value.trim();
+        if (!query) return;
+        if (infoChunks.length === 0 && !GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU") && GEMINI_API_KEY !== "YOUR_GEMINI_API_KEY_HERE") { // Only show if API key is likely set
+            addMessage("De bedrijfsdata is nog niet geladen. Een ogenblik geduld a.u.b.", 'bot');
+            return;
+        }
+
+
+        addMessage(query, 'user');
+        userInput.value = '';
+        const thinkingMsgId = 'thinking-message-' + Date.now();
+        addMessage("Even aan het nadenken...", 'bot', thinkingMsgId, true); // true for thinking class
+
+        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
+            removeMessageById(thinkingMsgId);
+            addMessage("FOUT: De Gemini API Key is niet correct geconfigureerd in het script. Vervang de placeholder key (beginnend met AIzaSyB04...).", 'bot');
+            return;
+        }
+        
+        const context = findRelevantChunks(query);
+
+        // Updated prompt for more direct answers
+        const promptText = `
+Je bent een behulpzame en vriendelijke virtuele assistent voor Digipunt, een organisatie in België.
+Je spreekt altijd in het Nederlands (Vlaams).
+Beantwoord de vraag van de gebruiker UITSLUITEND op basis van de volgende informatie.
+Vermijd onnodige begroetingen zoals 'Hallo' of 'Dag' in je antwoorden na de eerste interactie; ga direct over tot het beantwoorden van de vraag. Focus op het geven van het antwoord.
+Als de informatie niet aanwezig is in de context, geef dan duidelijk aan dat je die specifieke informatie niet hebt gevonden in de verstrekte documenten.
+Speculeer niet en verzin geen antwoorden. Wees beknopt en professioneel.
+Antwoord alsof je namens Digipunt spreekt. Gebruik "wij" of "Digipunt" waar gepast.
+
+Bedrijfsinformatie Context:
+--- START VAN CONTEXT ---
+${context || "Er werd geen specifieke context gevonden in de documenten voor deze vraag."}
+--- EINDE VAN CONTEXT ---
+
+Vraag van de gebruiker: ${query}
+
+Antwoord (in het Nederlands/Vlaams):
+`;
+
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: promptText
+                        }]
+                    }]
+                })
+            });
+
+            removeMessageById(thinkingMsgId);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("API Foutreactie:", errorData);
+                let errorMessage = `Fout: ${response.status} - Kon geen antwoord van de API krijgen.`;
+                if (errorData && errorData.error && errorData.error.message) {
+                    errorMessage += ` Bericht: ${errorData.error.message}`;
+                    if (errorData.error.message.toLowerCase().includes("api key not valid")) {
+                        errorMessage += " Controleer of uw API-sleutel correct is en of de Gemini API is ingeschakeld.";
+                    } else if (errorData.error.message.toLowerCase().includes("quota exceeded")) {
+                        errorMessage += " U heeft mogelijk uw API-quotum overschreden.";
+                    }
+                }
+                addMessage(errorMessage, 'bot');
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data.candidates && data.candidates.length > 0 && data.candidates[0].finishReason && data.candidates[0].finishReason !== "STOP" && data.candidates[0].finishReason !== "MAX_TOKENS") {
+                let blockMessage = `Antwoord generatie gestopt. Reden: ${data.candidates[0].finishReason}.`;
+                if (data.candidates[0].safetyRatings) {
+                    blockMessage += ` Veiligheidsbeoordelingen: ${JSON.stringify(data.candidates[0].safetyRatings)}`;
+                }
+                console.warn(blockMessage);
+                addMessage("Ik kon geen volledig antwoord genereren. Dit kan te wijten zijn aan inhoudsbeperkingen of een probleem met de vraag.", 'bot');
+                return;
+            }
+            
+            if (data.promptFeedback && data.promptFeedback.blockReason) {
+                console.warn("Prompt geblokkeerd:", data.promptFeedback);
+                addMessage(`Uw vraag kon niet worden verwerkt. Reden: ${data.promptFeedback.blockReason}. Probeer uw vraag anders te formuleren.`, 'bot');
+                return;
+            }
+
+            if (!data.candidates || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0].text) {
+                console.error("Onverwachte API-responsstructuur of ontbrekende inhoud:", data);
+                let debugMessage = "Sorry, ik heb een onverwacht antwoord van de API ontvangen.";
+                addMessage(debugMessage, 'bot');
+                return;
+            }
+
+            const botReply = data.candidates[0].content.parts[0].text.trim();
+            addMessage(botReply, 'bot');
+
+        } catch (error) {
+            removeMessageById(thinkingMsgId);
+            console.error("Fetch/Netwerk Fout:", error);
+            addMessage('Fout: Kon geen verbinding maken met de API. Controleer uw internetverbinding, API-sleutel, of dat het API-eindpunt correct is.', 'bot');
+        }
+    }
+
+    // --- HULPFUNCTIES ---
+    function addMessage(text, sender, id = null, isThinking = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        if (isThinking) {
+            messageDiv.classList.add('thinking');
+        }
+        messageDiv.textContent = text; // Using textContent for security
+        if (id) {
+            messageDiv.id = id;
+        }
+        chatbox.appendChild(messageDiv);
+        chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll
+    }
+
+    function removeMessageById(id) {
+        const msg = document.getElementById(id);
+        if (msg) {
+            msg.remove();
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+    userInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // --- INITIALISATIE ---
+    window.onload = () => {
+         // Improved API key check
+        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
+            loadStatus.innerHTML = `Welkom! <span class="warning">Configureer a.u.b. uw Gemini API Key in het script. De huidige key (beginnend met AIzaSyB04...) is een placeholder.</span>`;
+            // Still make input visible for local testing if desired, or hide it
+            chatInputSection.style.display = 'flex'; // Show input even if API key is bad
+            userInput.placeholder = "API Key niet geconfigureerd...";
+            userInput.disabled = true;
+            document.getElementById('sendButton').disabled = true;
+        } else {
+            loadDataFromUrl(); // Automatisch data laden
+        }
+    };
+</script>
+
+</body>
+</html>
