@@ -22,7 +22,7 @@ Online afspraken maken
 Digipunten met begeleider van Ateljee
 Dit is een lijst van Digipunten met een begeleider van Ateljee. Elk punt hieronder is een specifieke locatie met eigen openingstijden.
 
-Kringwinkel Vlaamsekaai
+### Kringwinkel Vlaamsekaai ###
 Locatie: Vlaamsekaai 10
 Openingstijden:
 Maandag 09u00 - 17u00
@@ -31,7 +31,7 @@ Woensdag 13u00 - 17u00
 Donderdag Gesloten
 Vrijdag Gesloten
 
-Kringwinkel Getouwstraat UCO
+### Kringwinkel Getouwstraat UCO ###
 Locatie: Getouwstraat 5
 Openingstijden:
 Maandag 09u00 - 12u00 en 13u00 - 17u00
@@ -40,7 +40,7 @@ Woensdag Gesloten
 Donderdag 09u00 - 12u00 en 13u00 - 17u00
 Vrijdag 09u00 - 12u00 en 13u00 - 17u00
 
-Wijkkantoor Rabot
+### Wijkkantoor Rabot ###
 Locatie: Griendeplein 16
 Openingstijden:
 Maandag 09u00 - 12u00
@@ -49,7 +49,7 @@ Woensdag Gesloten
 Donderdag 09u00 - 12u00
 Vrijdag 09u00 - 12u00
 
-De Serre
+### De Serre ###
 Locatie: Rerum Novarumplein 10
 Openingstijden:
 Maandag Gesloten
@@ -58,7 +58,7 @@ Woensdag Gesloten
 Donderdag Gesloten
 Vrijdag 13u00 - 17u00
 
-Kringwinkel Brugsesteenweg
+### Kringwinkel Brugsesteenweg ###
 Locatie: Brugsesteenweg 354
 Openingstijden:
 Maandag Gesloten
@@ -67,7 +67,7 @@ Woensdag Gesloten
 Donderdag 09u00 - 17u00
 Vrijdag Gesloten
 
-AMAL Gent
+### AMAL Gent ###
 Locatie: Kongostraat 42
 Openingstijden:
 Maandag 09u00 - 17u00
@@ -76,7 +76,7 @@ Woensdag Gesloten
 Donderdag 09u00 - 17u00
 Vrijdag 09u00 - 17u00
 
-Buurthuisje Scheldeoord
+### Buurthuisje Scheldeoord ###
 Locatie: Wolterslaan 16
 Openingstijden:
 Maandag 13u00-17u00
@@ -85,7 +85,7 @@ Woensdag Gesloten
 Donderdag Gesloten
 Vrijdag Gesloten
 
-Eetcafé Toreke
+### Eetcafé Toreke ###
 Locatie: Vlotstraat 22
 Openingstijden:
 Maandag 13u00 - 16u00
@@ -94,7 +94,7 @@ Woensdag Gesloten
 Donderdag 13u00 - 17u00
 Vrijdag Gesloten
 
-Jobteam Doornakker
+### Jobteam Doornakker ###
 Locatie: Doornakkerstraat 52
 Openingstijden:
 Maandag Gesloten
@@ -103,7 +103,7 @@ Woensdag Gesloten
 Donderdag 13u30 - 17u00
 Vrijdag 09u00 - 12u00
 
-Wijkgezondheidscentrum Sint-Amandsberg
+### Wijkgezondheidscentrum Sint-Amandsberg ###
 Locatie: Sporewegel 3
 Openingstijden:
 Maandag Gesloten
@@ -112,7 +112,7 @@ Woensdag Gesloten
 Donderdag 09u00 - 12u00
 Vrijdag Gesloten
 
-Bib Watersportbaan
+### Bib Watersportbaan ###
 Locatie: Neermeerskaai 1b
 Openingstijden:
 Maandag Gesloten
@@ -121,7 +121,7 @@ Woensdag 14u00 - 17u00
 Donderdag Gesloten
 Vrijdag Gesloten
 
-Bib Brugse Poort
+### Bib Brugse Poort
 Locatie: Blazoenstraat 9
 Openingstijden:
 Maandag Gesloten
@@ -130,7 +130,7 @@ Woensdag 14u00 - 17u00
 Donderdag Gesloten
 Vrijdag Gesloten
 
-Bib Sint-Amandsberg
+### Bib Sint-Amandsberg
 Locatie: Halvemaanstraat 92
 Openingstijden:
 Maandag Gesloten
@@ -139,7 +139,7 @@ Woensdag 14u00 - 17u00
 Donderdag Gesloten
 Vrijdag Gesloten
 
-Contactpersonen en Team Ateljee Digipunten
+### Contactpersonen en Team Ateljee Digipunten ###
 Dit is een overzicht van personeelsleden van Ateljee betrokken bij de Digipunten.
 
 Bart Peeters
@@ -245,7 +245,7 @@ Telefoon: 0499987383
 
 Datum In Dienst: Onbekend (niet gespecificeerd)
 
-Wat is District09?
+### Wat is District09? ###
 District09 is de ICT-partner van Stad Gent.
 Ze zorgen voor een stabiele, veilige en betrouwbare digitale omgeving voor stadsdiensten, burgers en partnerorganisaties.
 District09 ontwikkelt en beheert honderden toepassingen die dagelijks gebruikt worden door meer dan 10.000 medewerkers en Gentenaars.
@@ -253,7 +253,7 @@ Ze ondersteunen digitale inclusie door samen met partners Digipunten te organise
 Daarnaast beheren ze het glasvezelnetwerk van de stad, bouwen ze aan innovatieve technologieën en zorgen ze voor duurzame, ethische ICT-oplossingen.
 District09 telt meer dan 200 medewerkers en speelt een centrale rol in de digitale transformatie van Gent.
 
-Wat doet District09 concreet?
+### Wat doet District09 concreet? ###
 Beheert meer dan 600 softwaretoepassingen
 
 Ondersteunt Digipunten en e-inclusie-initiatieven
@@ -269,7 +269,7 @@ District09 is sinds 2006 actief betrokken bij e-inclusieprojecten in Gent.
 Ze bieden ondersteuning bij de organisatie van Digipunten en werken samen met organisaties zoals Ateljee om hulp ter plaatse mogelijk te maken.
 Door middel van infrastructuur, expertise en samenwerking helpt District09 de digitale kloof in Gent te verkleinen.
 
-Contactgegevens District09
+### Contactgegevens District09 ###
 Locatie: Jubileumlaan 217, 9000 Gent
 Telefoonnummer: 09 266 09 00
 E-mail: info@district09.be
@@ -277,16 +277,9 @@ Website: https://district09.gent
 Facebook: facebook.com/District09.gent
 LinkedIn: linkedin.com/company/district09
 
-Personeelsleden Digipunt met District09 Laptop
-De volgende personeelsleden van Digipunt hebben een laptop van District09 (D09):
+### Personeelsleden Digipunt met District09 Laptop ###
+De volgende personeelsleden van Digipunt hebben een laptop van District09 (D09): Bart Peeters, Benjamien Deprez, Ayman Nasser, Silvie Franck
 
-Bart Peeters
 
-Benjamien Deprez
-
-Ayman Nasser
-
-Silvie Franck
-
---einde--
+###einde### 
 
