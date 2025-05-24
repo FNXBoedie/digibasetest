@@ -245,6 +245,34 @@
             border-top: 1px solid var(--border);
         }
 
+        #totalRecallButton { /* NEW */
+            background-color: var(--surface-variant);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            width: 44px; /* Adjusted for better visual balance with send button */
+            height: 44px;
+            border-radius: 50%;
+            margin-right: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 20px; /* For emoji */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        #totalRecallButton:hover {
+            background-color: var(--primary-variant);
+            color: white;
+        }
+        #totalRecallButton.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 8px rgba(80, 160, 224, 0.5);
+            transform: scale(1.05);
+        }
+
+
         #userInput {
             flex: 1;
             background-color: rgba(255, 255, 255, 0.08);
@@ -280,6 +308,7 @@
             justify-content: center;
             transition: all 0.2s ease;
             box-shadow: 0 2px 10px rgba(80, 160, 224, 0.3);
+            flex-shrink: 0; /* Prevent shrinking */
         }
         #sendButton:hover {
             background-color: var(--primary-variant);
@@ -476,7 +505,7 @@
             #userInput {
                 padding: 12px 16px;
             }
-            #sendButton {
+            #sendButton, #totalRecallButton { /* Ensure consistent sizing */
                 width: 44px;
                 height: 44px;
             }
@@ -486,7 +515,7 @@
 <body>
 
 <div id="appHeader">
-    <h1>DigiBase Json met handleiding</h1>
+    <h1>DigiBase Met Bredere System Instructions</h1>
     <p>Uw interne virtuele assistent van Digipunt</p>
     <div id="helpSection">
         <button id="helpButton" aria-label="Help en opties">
@@ -507,6 +536,7 @@
     </div>
     <div id="chatbox"></div>
     <div id="chatInputSection">
+        <button id="totalRecallButton" title="Total Recall Mode">🧠</button> <!-- NEW BUTTON -->
         <input type="text" id="userInput" placeholder="Stel uw vraag aan Digipunt...">
         <button id="sendButton" onclick="sendMessage()" aria-label="Verstuur bericht">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -544,19 +574,23 @@
 
 <script>
     // --- CONFIGURATIE ---
-    const GEMINI_API_KEY = "AIzaSyAkeZNQdyOcf27Wo9D75ydwELGC2XeM_eU";
+    const GEMINI_API_KEY = "AIzaSyAkeZNQdyOcf27Wo9D75ydwELGC2XeM_eU"; // Vervang met uw daadwerkelijke API key
     const DATA_FILE_URL = 'data.json';
     const MANUAL_FILE_URL = 'handleiding.html';
     const MAX_HISTORY_TURNS = 5;
 
     // --- GLOBALE VARIABELEN ---
     let infoChunks = [];
+    let fullJsonDataString = ""; // NIEUW: Om de volledige JSON data als string op te slaan
+    let isTotalRecallModeActive = false; // NIEUW: Om de modus bij te houden
     let conversationHistory = [];
+
     const chatbox = document.getElementById('chatbox');
     const userInput = document.getElementById('userInput');
     const loadStatus = document.getElementById('loadStatus');
     const fileLoadSection = document.getElementById('fileLoadSection');
     const chatInputSection = document.getElementById('chatInputSection');
+    const totalRecallButton = document.getElementById('totalRecallButton'); // NIEUW
 
     // --- DOM Elementen voor Help & Popups ---
     const helpButton = document.getElementById('helpButton');
@@ -580,23 +614,40 @@
         "Wanneer is de Vlaamse Kaai open?",
         "Ik wil AMAL bezoeken en heb tijd op woensdag en zaterdag.",
         "Hoe heet dat Digipunt in een café ook alweer?",
-        "Wie heeft er allemaal een laptop van d09?"
+        "Wie heeft er allemaal een laptop van d09?",
+        "Welk personeelslid is het meest recent gestart bij Digipunt?",
+        "Welke drie personeelsleden zijn er al het langst in dienst?",
+        "Ik heb een conflict met een collega, wie contacteer ik best?",
+        "Ik wil op maandagochtend naar een Digipunt waar Bart Peeters werkt. Welke opties heb ik?",
+        "Welke Digipunten zijn open op dinsdagmiddag en bevinden zich niet in een Kringwinkel?"     
     ];
 
 
     // --- DATA LAAD LOGICA (van URL) ---
     async function loadDataFromUrl() {
         loadStatus.textContent = `Bezig met ophalen van data...`;
-        chatInputSection.style.display = 'flex';
+        chatInputSection.style.display = 'flex'; // Toon input sectie met Total Recall knop
 
         try {
             const response = await fetch(DATA_FILE_URL);
             if (!response.ok) {
                  loadStatus.innerHTML = `<span class="warning">Fout: Kon data niet ophalen van ${DATA_FILE_URL}. Status: ${response.status}</span>`;
+                 totalRecallButton.disabled = true; // Schakel knop uit als data faalt
                  return;
             }
             const jsonData = await response.json();
-            processCompanyInfo(jsonData);
+
+            // Sla de volledige JSON data op voor Total Recall Mode
+            try {
+                fullJsonDataString = JSON.stringify(jsonData, null, 2); // null, 2 for pretty print, or just jsonData for compact
+            } catch (stringifyError) {
+                console.error("Fout bij stringify van JSON data:", stringifyError);
+                fullJsonDataString = "Fout: Kon volledige data niet verwerken.";
+                loadStatus.innerHTML = `<span class="warning">Fout: Kon volledige data niet correct verwerken voor Total Recall Mode.</span>`;
+                totalRecallButton.disabled = true; // Schakel knop uit
+            }
+            
+            processCompanyInfo(jsonData); // Verwerk voor standaard RAG-modus
 
             loadStatus.textContent = `Data succesvol geladen. De assistent is klaar!`;
             setTimeout(() => {
@@ -608,32 +659,32 @@
 
         } catch (error) {
             if (error instanceof SyntaxError) {
-                 loadStatus.innerHTML = `<span class="warning">Fout: De data in ${DATA_FILE_URL} is geen geldige JSON. Controleer het bestand. (${error.message})</span>`;
+                 loadStatus.innerHTML = `<span class="warning">Fout: De data in ${DATA_FILE_URL} is geen geldige JSON. (${error.message})</span>`;
             } else {
                  loadStatus.innerHTML = `<span class="warning">Fout bij ophalen data: ${error.message}</span>`;
             }
             console.error("Fetch/Parse error:", error);
+            totalRecallButton.disabled = true; // Schakel knop uit bij fout
         }
     }
 
-    // --- DATA VERWERKING ---
+    // --- DATA VERWERKING (voor standaard modus) ---
     function processCompanyInfo(jsonData) {
+        // Bestaande logica blijft, dit is voor de RAG-modus
         if (Array.isArray(jsonData) && jsonData.every(item => typeof item === 'object' && item !== null && typeof item.content === 'string')) {
             infoChunks = jsonData.map(item => item.content.trim()).filter(chunk => chunk.length > 0);
+        } else if (Array.isArray(jsonData) && jsonData.every(item => typeof item === 'string')) {
+            console.warn("JSON data is een array van strings. Aanbevolen formaat is een array van objecten met een 'content' property voor standaard modus.");
+            infoChunks = jsonData.map(chunk => chunk.trim()).filter(chunk => chunk.length > 0);
         } else {
-            if (Array.isArray(jsonData) && jsonData.every(item => typeof item === 'string')) {
-                console.warn("JSON data is een array van strings. Aanbevolen formaat is een array van objecten met een 'content' property.");
-                infoChunks = jsonData.map(chunk => chunk.trim()).filter(chunk => chunk.length > 0);
-            } else {
-                console.error("Ongeldig JSON-formaat in processCompanyInfo.");
-                loadStatus.innerHTML = `<span class="warning">Fout: Ongeldige structuur in het databestand.</span>`;
-                infoChunks = [];
-            }
+            console.error("Ongeldig JSON-formaat voor standaard chunk-verwerking in processCompanyInfo. Total Recall Mode gebruikt de ruwe JSON.");
+            // infoChunks blijft leeg, standaard modus zal dan wellicht melden dat er geen context is.
+            // Dit is oké zolang Total Recall Mode de `fullJsonDataString` heeft.
         }
     }
 
     // --- CHATBOT LOGICA ---
-    function findRelevantChunks(query) {
+    function findRelevantChunks(query) { // Voor standaard modus
         if (infoChunks.length === 0) return "";
         const queryWords = query.toLowerCase().split(/\s+/).filter(word => word.length > 2 && !["de", "het", "een", "is", "wie", "wat", "waar", "zijn", "ik", "u", "van", "voor"].includes(word));
         let relevantChunksWithScores = [];
@@ -652,31 +703,76 @@
     async function sendMessage() {
         const query = userInput.value.trim();
         if (!query) return;
-        if (infoChunks.length === 0 && !GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU") && GEMINI_API_KEY !== "YOUR_GEMINI_API_KEY_HERE") {
-            addMessageToChat("De bedrijfsdata is nog niet geladen.", 'bot');
-            return;
+
+        // Check if data is loaded for the respective mode
+        if (isTotalRecallModeActive) {
+            if (!fullJsonDataString || fullJsonDataString === "Fout: Kon volledige data niet verwerken.") {
+                addMessageToChat("Total Recall Mode is actief, maar de volledige data is niet beschikbaar. Probeer de pagina te vernieuwen of de modus te deactiveren.", 'bot');
+                return;
+            }
+        } else { // Standaard modus
+            // De oude check was: infoChunks.length === 0 && !GEMINI_API_KEY.startsWith("AIzaSyB04OB...")
+            // We houden een simpele check voor infoChunks.
+            if (infoChunks.length === 0) {
+                 addMessageToChat("De data voor de standaard modus is niet (correct) geladen. Probeer Total Recall Mode of controleer de data bron.", 'bot');
+                 // return; // We kunnen de gebruiker nog steeds laten proberen, de LLM zal dan geen context hebben.
+            }
         }
+
 
         addMessageToChat(query, 'user');
         userInput.value = '';
         const thinkingMsgId = 'thinking-message-' + Date.now();
         addMessageToChat("Even aan het nadenken...", 'bot', thinkingMsgId, true);
 
-        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
+        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) { // Dummy key check
             removeMessageById(thinkingMsgId);
             addMessageToChat("FOUT: Gemini API Key niet correct geconfigureerd.", 'bot');
             return;
         }
 
-        const context = findRelevantChunks(query);
-        let currentConversationContents = [];
+        let contextForLLM = "";
+        let systemInstructionText = "";
         const historyForGemini = conversationHistory.map(turn => ({
             role: turn.sender === 'user' ? 'user' : 'model',
             parts: [{ text: turn.text }]
         }));
-        currentConversationContents = [...historyForGemini, { role: 'user', parts: [{ text: query }] }];
+        
+        let currentConversationContents = [...historyForGemini, { role: 'user', parts: [{ text: query }] }];
 
-        const systemInstruction = `
+
+        if (isTotalRecallModeActive) {
+            contextForLLM = fullJsonDataString;
+            systemInstructionText = `
+Je bent een intelligente, behulpzame en vriendelijke virtuele assistent voor Digipunt in "Total Recall Mode". Je spreekt altijd in het Nederlands (Vlaams).
+Je doel is om de gebruiker zo goed mogelijk te helpen door vragen te beantwoorden, problemen op te lossen en suggesties te doen, primair gebaseerd op de "VOLLEDIGE BEDRIJFSINFORMATIE" hieronder.
+
+KERNPRINCIPES VOOR JE ANTWOORDEN:
+1.  **Data als Basis:** De "VOLLEDIGE BEDRIJFSINFORMATIE" is je primaire bron. Streef ernaar om antwoorden direct uit deze data te halen of er logisch uit af te leiden.
+2.  **Begrijp de Intentie:** Probeer de *werkelijke vraag of het probleem* van de gebruiker te begrijpen, zelfs als het niet perfect geformuleerd is.
+3.  **Logische Verbindingen en Inferentie:**
+    *   Je wordt aangemoedigd om logische verbanden te leggen tussen de vraag van de gebruiker en de informatie in de database. Dit omvat het koppelen van problemen aan relevante rollen, functies, specialiteiten, of diensten die in de data worden genoemd.
+    *   Bijvoorbeeld: Als de data een personeelslid met specialiteit "AI" bevat, en de gebruiker vraagt naar hulp met een AI-tool zoals ChatGPT, dan is het logisch en wenselijk om dat personeelslid te suggereren.
+    *   Een ander voorbeeld: Als de gebruiker een probleem met een collega meldt, en de data bevat een "Arbeidsbegeleider", is het logisch om die persoon te suggereren.
+    *   Gebruik je redeneervermogen om de meest relevante informatie of contactpersoon te identificeren, zelfs als de link niet 100% expliciet in de tekst staat, zolang het een sterke, logische connectie is binnen de context van de verstrekte data.
+4.  **Suggesties en Alternatieven:** Als een direct antwoord niet mogelijk is, maar je kunt wel een relevante suggestie doen (bijv. een andere contactpersoon, een alternatieve aanpak gebaseerd op de data), doe dat dan.
+5.  **Wees Duidelijk en Transparant:** Als je een inferentie maakt, kun je dit subtiel aangeven (bijv. "Op basis van hun specialiteit in AI, zou Bart Peeters je hier mogelijk mee kunnen helpen.").
+6.  **Indien Geen Match (zelfs na redeneren):** Als, zelfs na zorgvuldig overwegen en proberen logische verbanden te leggen, de informatie of een relevant aanknopingspunt *echt niet* in de "VOLLEDIGE BEDRIJFSINFORMATIE" te vinden is, geef dan aan: "Op basis van de mij bekende informatie over Digipunt kan ik hier geen specifiek antwoord of suggestie voor geven." Vermijd speculatie buiten de data.
+7.  **Professioneel en Behulpzaam:** Wees altijd professioneel, vriendelijk en gericht op het helpen van de gebruiker. Gebruik "wij" of "Digipunt".
+
+BELANGRIJK VOOR CONTEXTGEBRUIK:
+- Analyseer datums (DD-MM-YYYY) zorgvuldig voor vergelijkingen.
+- Presenteer lijsten als de data dit bevat.
+- De huidige datum is minstens mei 2025 tenzij de user anders aangeeft.
+
+VOLLEDIGE BEDRIJFSINFORMATIE (gebruik dit als basis voor je antwoorden en suggesties):
+--- START VAN VOLLEDIGE BEDRIJFSINFORMATIE ---
+${contextForLLM}
+--- EINDE VAN VOLLEDIGE BEDRIJFSINFORMATIE ---
+`;
+        } else { // Standaard RAG-achtige modus
+            contextForLLM = findRelevantChunks(query);
+            systemInstructionText = `
 Je bent een behulpzame en vriendelijke virtuele assistent voor Digipunt, een organisatie in België.
 Je spreekt altijd in het Nederlands (Vlaams).
 Beantwoord de vraag van de gebruiker UITSLUITEND op basis van de hieronder volgende "CONTEXT VAN BEDRIJFSINFORMATIE" indien deze relevant is voor de HUIDIGE vraag van de gebruiker.
@@ -691,14 +787,16 @@ BELANGRIJK VOOR CONTEXTGEBRUIK:
 - Presenteer lijsten als de context dit bevat.
 CONTEXT VAN BEDRIJFSINFORMATIE (gebruik dit voor de HUIDIGE vraag van de gebruiker):
 --- START VAN CONTEXT ---
-${context || "Er werd geen specifieke context gevonden in de documenten voor deze vraag."}
+${contextForLLM || "Er werd geen specifieke context gevonden in de documenten voor deze vraag."}
 --- EINDE VAN CONTEXT ---
 `;
+        }
+
         try {
             const requestBody = {
                 contents: currentConversationContents,
-                system_instruction: { parts: [{ text: systemInstruction }] },
-                generationConfig: {}
+                system_instruction: { parts: [{ text: systemInstructionText }] },
+                generationConfig: {} // Voeg hier eventueel generationConfig opties toe zoals temperature, topK, topP
             };
             const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
                 method: 'POST',
@@ -711,6 +809,9 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
             if (!response.ok) {
                 const errorData = await response.json();
                 let errorMessage = `Fout: ${response.status}. API Bericht: ${errorData?.error?.message || 'Onbekende API fout'}`;
+                if (response.status === 429) {
+                    errorMessage += " U verstuurt mogelijk te snel berichten. Probeer het over een moment opnieuw.";
+                }
                 addMessageToChat(errorMessage, 'bot');
                 return;
             }
@@ -724,7 +825,12 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
                 return;
             }
             if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                addMessageToChat("Onverwacht API-antwoord.", 'bot');
+                 if (data.candidates && data.candidates.length > 0 && data.candidates[0].content === undefined && data.candidates[0].finishReason === "SAFETY") {
+                    addMessageToChat("Antwoord geblokkeerd wegens veiligheidsinstellingen. Probeer uw vraag anders te formuleren.", 'bot');
+                } else {
+                    addMessageToChat("Onverwacht API-antwoord of geen tekst ontvangen.", 'bot');
+                    console.log("Unexpected API response data:", data);
+                }
                 return;
             }
             addMessageToChat(data.candidates[0].content.parts[0].text.trim(), 'bot');
@@ -739,13 +845,18 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', sender);
         if (isThinking) messageDiv.classList.add('thinking');
-        messageDiv.textContent = text;
+        // Basic Markdown-like formatting for **bold** and *italic*
+        let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        // Replace \n with <br> for newlines
+        formattedText = formattedText.replace(/\n/g, '<br>');
+        messageDiv.innerHTML = formattedText; // Use innerHTML for formatted text
         if (id) messageDiv.id = id;
         chatbox.appendChild(messageDiv);
         chatbox.scrollTop = chatbox.scrollHeight;
 
         if (!isThinking) {
-            conversationHistory.push({ sender: sender, text: text });
+            conversationHistory.push({ sender: sender, text: text }); // Store original text for history
             if (conversationHistory.length > MAX_HISTORY_TURNS * 2) {
                 conversationHistory.splice(0, conversationHistory.length - (MAX_HISTORY_TURNS * 2));
             }
@@ -760,7 +871,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
     // --- Popup en Help Menu Logica ---
     function openPopup(popupElement) {
         popupOverlay.style.display = 'block';
-        popupElement.style.display = 'flex'; // Zet display naar flex om de popup te tonen en flex-direction te activeren
+        popupElement.style.display = 'flex';
         helpMenu.style.display = 'none';
     }
 
@@ -770,7 +881,7 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
     }
 
     async function loadManual() {
-        manualContent.innerHTML = '<p>Bezig met laden van handleiding...</p>'; // Reset
+        manualContent.innerHTML = '<p>Bezig met laden van handleiding...</p>';
         try {
             const response = await fetch(MANUAL_FILE_URL);
             if (!response.ok) {
@@ -793,8 +904,8 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
             button.textContent = questionText;
             button.onclick = () => {
                 userInput.value = questionText;
-                sendMessage();
-                // closePopup(examplePopup); // VERWIJDERD: Popup blijft open
+                // sendMessage(); // User can click send or press enter
+                closePopup(examplePopup); // Close popup after selecting a question
             };
             exampleQuestionsContent.appendChild(button);
         });
@@ -838,19 +949,37 @@ ${context || "Er werd geen specifieke context gevonden in de documenten voor dez
         }
     });
 
+    // NIEUW: Event listener voor Total Recall Mode knop
+    totalRecallButton.addEventListener('click', () => {
+        if (totalRecallButton.disabled) return; // Doe niks als de knop uitgeschakeld is
+
+        isTotalRecallModeActive = !isTotalRecallModeActive;
+        totalRecallButton.classList.toggle('active', isTotalRecallModeActive);
+
+        if (isTotalRecallModeActive) {
+            addMessageToChat("Total Recall Mode geactiveerd. De assistent gebruikt nu de volledige database.", 'bot');
+            userInput.placeholder = "Vraag (Total Recall Mode)...";
+        } else {
+            addMessageToChat("Total Recall Mode gedeactiveerd. Standaard modus actief.", 'bot');
+            userInput.placeholder = "Stel uw vraag aan Digipunt...";
+        }
+        userInput.focus();
+    });
+
+
     // --- INITIALISATIE ---
     window.onload = () => {
-        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) {
+        if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE" || GEMINI_API_KEY.startsWith("AIzaSyB04OBGNKEWmZp1WSvgAjjDzYMe9SGE_fU")) { // Dummy key check
             loadStatus.innerHTML = `Welkom! <span class="warning">Configureer a.u.b. uw Gemini API Key.</span>`;
             chatInputSection.style.display = 'flex';
             userInput.placeholder = "API Key niet geconfigureerd...";
             userInput.disabled = true;
             document.getElementById('sendButton').disabled = true;
             helpButton.disabled = true;
+            totalRecallButton.disabled = true; // Schakel ook Total Recall knop uit
         } else {
             loadDataFromUrl();
         }
-        // Zorg ervoor dat popups initieel verborgen zijn (extra zekerheid, hoewel CSS dit al zou moeten doen)
         manualPopup.style.display = 'none';
         examplePopup.style.display = 'none';
         popupOverlay.style.display = 'none';
